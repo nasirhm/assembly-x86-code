@@ -1,0 +1,79 @@
+     1                                 %line 1+1 assign2.s
+     2                                 [section .data]
+     3                                 
+     4                                 BUFLEN: equ 20
+     5 00000000 00<rept>               buffer: times BUFLEN db 0
+     6 00000014 0A                     newline: db 10
+     7                                 
+     8                                 [section .text]
+     9                                 
+    10                                 [global _start]
+    11                                 _start:
+    12 00000000 48C7C601000000          mov rsi, 1
+    13 00000007 48C7C70A000000          mov rdi, 10
+    14 0000000E E834000000              call print_int
+    15                                 
+    16 00000013 48C7C601000000          mov rsi, 1
+    17 0000001A 48C7C732B71E0B          mov rdi, 186562354
+    18 00000021 E821000000              call print_int
+    19                                 
+    20 00000026 48C7C601000000          mov rsi, 1
+    21 0000002D 48BF78563412EFBEAD-     mov rdi, 0xdeadbeef12345678
+    22 0000002D DE                 
+    23 00000037 E80B000000              call print_int
+    24                                 
+    25                                 
+    26 0000003C 48C7C03C000000          mov rax, 60
+    27 00000043 48C7C700000000          mov rdi, 0
+    28 0000004A 0F05                    syscall
+    29                                 
+    30                                 print_int:
+    31                                 
+    32 0000004C 48C7C114000000          mov rcx, BUFLEN
+    33                                 
+    34 00000053 49C7C00A000000          mov r8, 10
+    35                                 
+    36 0000005A 4889F8                  mov rax, rdi
+    37                                 
+    38                                 start_loop:
+    39                                 
+    40 0000005D 49F7F0                  div r8
+    41                                 
+    42 00000060 4883C230                add rdx, 48
+    43                                 
+    44 00000064 4989C9                  mov r9, rcx
+    45 00000067 49FFC9                  dec r9
+    46                                 
+    47 0000006A 418891[00000000]        mov byte[buffer+r9], dl
+    48                                 
+    49 00000071 48C7C200000000          mov rdx, 0
+    50                                 
+    51 00000078 E2E1                    loop start_loop
+    52                                 
+    53                                 print:
+    54                                 
+    55 0000007A 48C7C001000000          mov rax, 1
+    56 00000081 48C7C701000000          mov rdi, 1
+    57 00000088 48C7C6[00000000]        mov rsi, buffer
+    58 0000008F 48C7C214000000          mov rdx, BUFLEN
+    59 00000096 0F05                    syscall
+    60                                 
+    61                                 
+    62 00000098 48C7C001000000          mov rax, 1
+    63 0000009F 48C7C701000000          mov rdi, 1
+    64 000000A6 48C7C6[00000000]        mov rsi, newline
+    65 000000AD 48C7C201000000          mov rdx, 1
+    66 000000B4 0F05                    syscall
+    67                                 
+    68 000000B6 48C7C000000000          mov rax, 0
+    69 000000BD 48C7C200000000          mov rdx, 0
+    70                                 
+    71                                 
+    72 000000C4 48C7C114000000          mov rcx, BUFLEN
+    73 000000CB 4989C9                  mov r9, rcx
+    74                                 clear_buffer:
+    75 000000CE 49FFC9                  dec r9
+    76 000000D1 41C681[00000000]00      mov byte[buffer+r9], 0
+    77 000000D9 E2F1                    loop clear_buffer
+    78                                 
+    79 000000DB C3                      ret

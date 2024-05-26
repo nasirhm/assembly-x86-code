@@ -1,0 +1,59 @@
+     1                                 %line 1+1 xoroshiro64.s
+     2                                 [section .data]
+     3                                 
+     4 00000000 4A190200D9020000       s: dd 137546, 729
+     5 00000008 0000                   result: dw 0
+     6                                 
+     7                                 [section .text]
+     8                                 
+     9                                 [global _start]
+    10                                 
+    11                                 _start:
+    12                                 
+    13 00000000 55                      push rbp
+    14 00000001 4889E5                  mov rbp, rsp
+    15                                 
+    16                                 .loop:
+    17                                 
+    18 00000004 E81C000000              call next
+    19                                 
+    20 00000009 48C7C001000000          mov rax, 1
+    21 00000010 48C7C701000000          mov rdi, 1
+    22 00000017 488D3425[00000000]      lea rsi, [result]
+    23 0000001F 48C7C204000000          mov rdx, 4
+    24                                 
+    25 00000026 0F05                    syscall
+    26                                 
+    27 00000028 EBD8                    jmp .loop
+    28                                 
+    29                                 next:
+    30                                 
+    31 0000002A 55                      push rbp
+    32 0000002B 4889E5                  mov rbp, rsp
+    33                                 
+    34 0000002E 8B0425[00000000]        mov eax, [s]
+    35 00000035 8B1C25[04000000]        mov ebx, [s+4]
+    36                                 
+    37 0000003C B9BB79379E              mov ecx, 0x9E3779BB
+    38 00000041 0FAFC1                  imul eax, ecx
+    39 00000044 B905000000              mov ecx, 5
+    40 00000049 D3C0                    rol eax, cl
+    41 0000004B 6BC005                  imul eax, 5
+    42 0000004E 890425[00000000]        mov [result], eax
+    43 00000055 8B0425[00000000]        mov eax, [s]
+    44 0000005C 89D9                    mov ecx, ebx
+    45 0000005E 31C1                    xor ecx, eax
+    46 00000060 89CA                    mov edx, ecx
+    47 00000062 B11A                    mov cl, 26
+    48 00000064 D3C0                    rol eax, cl
+    49 00000066 C1E109                  shl ecx, 9
+    50 00000069 31C8                    xor eax, ecx
+    51 0000006B 31D0                    xor eax, edx
+    52 0000006D 890425[00000000]        mov [s], eax
+    53 00000074 89D0                    mov eax, edx
+    54 00000076 B10D                    mov cl, 13
+    55 00000078 D3C0                    rol eax, cl
+    56 0000007A 890425[04000000]        mov [s+4], eax
+    57 00000081 8B0425[00000000]        mov eax, [result]
+    58 00000088 5D                      pop rbp
+    59 00000089 C3                      ret
